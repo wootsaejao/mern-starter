@@ -9,13 +9,31 @@ import sanitizeHtml from 'sanitize-html';
  * @param res
  * @returns void
  */
-export function getPosts(req, res) {
-  Post.find().sort('-dateAdded').exec((err, posts) => {
-    if (err) {
-      res.status(500).send(err);
-    }
-    res.json({ posts });
-  });
+export async function getPosts(req, res) {
+  // Post.find().sort('-dateAdded').exec((err, posts) => {
+  //   if (err) {
+  //     res.status(500).send(err);
+  //   }
+  //   res.json({ posts });
+  // });
+
+  const queryPostsAsync = () => {
+    return new Promise((resolve, reject) => {
+      Post.find().sort('-dateAdded').exec((err, posts) => {
+        if (err) {
+          reject(err);
+        }
+        resolve({ posts });
+      });
+    });
+  };
+
+  try {
+    const result = await queryPostsAsync();
+    res.json(result);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 }
 
 /**
